@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.warezilla.model.Transaction;
 import com.app.warezilla.service.TransactionService;
+import com.app.warezilla.service.TransactionService.Summary;
 
 @RestController
 @RequestMapping("/api")
@@ -31,22 +35,44 @@ public class TransactionController {
     }
     
     @PostMapping("/transactions")
-    public Transaction addTransaction(@RequestBody Transaction transaction) {
-        return service.addTransaction(transaction);
+    public ResponseEntity<Transaction> addTransaction(@RequestBody Transaction transaction) {
+    	try {
+    		return new ResponseEntity<Transaction>(service.addTransaction(transaction), HttpStatus.OK);
+    		
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
     }
 
     @GetMapping("/transactions/today")
-    public List<Transaction> getTodayTransactions() {
-        return service.getTransactionsForToday();
+    public ResponseEntity<List<Transaction>> getTodayTransactions() {
+    	
+    	try {
+    		return new ResponseEntity<List<Transaction>>(service.getTransactionsForToday(), HttpStatus.OK) ;
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+        
     }
 
     @GetMapping("/transactions/history")
-    public List<Transaction> getTransactionsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return service.getTransactionsForDate(date);
+    public ResponseEntity<List<Transaction>> getTransactionsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        
+    	try {
+    		return new ResponseEntity<List<Transaction>>(service.getTransactionsForDate(date), HttpStatus.OK) ;
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+    	
     }
 
     @GetMapping("/summary/today")
-    public TransactionService.Summary getTodaySummary() {
-        return service.getTodaySummary();
+    public ResponseEntity<Summary> getTodaySummary() {
+    	
+    	try {
+    		return new ResponseEntity<>(service.getTodaySummary(), HttpStatus.OK) ;
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
     }
 }

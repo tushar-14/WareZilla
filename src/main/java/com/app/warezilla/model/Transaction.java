@@ -1,10 +1,8 @@
 package com.app.warezilla.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Entity
+@Builder
 public class Transaction {
 
     @Id
@@ -35,5 +34,6 @@ public class Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 }

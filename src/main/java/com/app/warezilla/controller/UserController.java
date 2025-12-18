@@ -5,6 +5,8 @@ import com.app.warezilla.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,21 +24,35 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PostMapping
-    public void createUser(@RequestBody User user){
-        userService.saveUser(user);
-    }
+    @PutMapping()
+    public ResponseEntity<?> updateUser(@RequestBody User user){
 
-    @PutMapping("/{userName}")
-    public ResponseEntity<?> updateUser(@RequestBody User user , @PathVariable String userName){
-        User userInDb = userService.findByUserName(userName);
+        try{
 
-        if(userInDb!= null){
-            userInDb.setUserName(user.getUserName());
-            userInDb.setPassword(user.getPassword());
-            userService.saveUser(userInDb);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            userService.updateUser(authentication,user);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<?> deleteUser(){
+
+        try{
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            userService.deleteUserByUserName(authentication);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     }
 }

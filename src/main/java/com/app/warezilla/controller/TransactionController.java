@@ -42,7 +42,7 @@ public class TransactionController {
 		}
     }
 
-    @GetMapping("/today/{userName}")
+    @GetMapping("/{userName}")
     public ResponseEntity<List<Transaction>> getTodayTransactions(@PathVariable String userName) {
     	
     	try {

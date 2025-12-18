@@ -27,6 +27,8 @@ public class User {
     @NonNull
     private String password;
 
+    private List<String> roles;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactionList = new ArrayList<>();
 }

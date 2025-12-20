@@ -9,8 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/user")
 //@CrossOrigin(origins = "*")
@@ -19,18 +17,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public List<User> getAllUsers(){
-        return userService.getAllUsers();
-    }
-
     @PutMapping()
     public ResponseEntity<?> updateUser(@RequestBody User user){
 
         try{
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            userService.updateUser(authentication,user);
+            userService.updateUser(authentication.getName(),user);
 
             return new ResponseEntity<>(HttpStatus.OK);
 
@@ -46,7 +39,7 @@ public class UserController {
         try{
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            userService.deleteUserByUserName(authentication);
+            userService.deleteUserByUserName(authentication.getName());
 
             return new ResponseEntity<>(HttpStatus.OK);
 

@@ -3,8 +3,6 @@ package com.app.warezilla.service;
 import com.app.warezilla.model.User;
 import com.app.warezilla.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +17,18 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public void saveUser(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Arrays.asList("USER"));
+        userRepository.save(user);
+    }
+
+    public void createAdmin(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList("USER","ADMIN"));
         userRepository.save(user);
     }
 
@@ -40,8 +45,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserByUserName(Authentication authentication){
-        String userName = authentication.getName();
+    public void deleteUserByUserName(String userName){
         userRepository.deleteByUserName(userName);
     }
 
@@ -50,9 +54,9 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Authentication authentication ,User user){
+    public void updateUser(String userName ,User user){
 
-        User userIndb = findByUserName(authentication.getName());
+        User userIndb = findByUserName(userName);
 
         if(user!= null){
             userIndb.setUserName(user.getUserName());

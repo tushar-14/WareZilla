@@ -6,6 +6,8 @@ import com.app.warezilla.model.TransactionType;
 import com.app.warezilla.model.User;
 import com.app.warezilla.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +53,13 @@ public class TransactionService {
         return new Summary(totalIn, totalOut);
     }
 
+    @Transactional
     public void deleteTransaction(Long id){
-        transactionRepository.deleteById(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUserName(authentication.getName());
+
+        if(user.getTransactionList().removeIf(x -> x.getId().equals(id))){
+            transactionRepository.deleteById(id);
+        }
     }
 }

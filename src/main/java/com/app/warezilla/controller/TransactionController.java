@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,11 +31,13 @@ public class TransactionController {
     public CsrfToken csrf(CsrfToken token) {
         return token;
     }
-    
-    @PostMapping("/{userName}")
-    public ResponseEntity<Transaction> addTransaction(@RequestBody Transaction transaction , @PathVariable String userName) {
+
+    //add a transaction
+    @PostMapping()
+    public ResponseEntity<Transaction> addTransaction(@RequestBody Transaction transaction) {
     	try {
-            service.addTransaction(transaction,userName);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            service.addTransaction(transaction, authentication.getName());
     		return new ResponseEntity<Transaction>(transaction, HttpStatus.OK);
     		
 		} catch (Exception e) {
@@ -42,45 +46,52 @@ public class TransactionController {
 		}
     }
 
-    @GetMapping("/{userName}")
-    public ResponseEntity<List<Transaction>> getTodayTransactions(@PathVariable String userName) {
+    //get transaction for current date
+    @GetMapping()
+    public ResponseEntity<List<Transaction>> getTodayTransactions() {
     	
     	try {
-    		return new ResponseEntity<List<Transaction>>(service.getTransactionsForToday(userName), HttpStatus.OK) ;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    		return new ResponseEntity<List<Transaction>>(service.getTransactionsForToday(authentication.getName()), HttpStatus.OK) ;
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
         
     }
 
-    @GetMapping("/history/{userName}")
-    public ResponseEntity<List<Transaction>> getTransactionsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @PathVariable String userName) {
+    //get transactions for a selected date
+    @GetMapping("/history")
+    public ResponseEntity<List<Transaction>> getTransactionsByDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         
     	try {
-    		return new ResponseEntity<List<Transaction>>(service.getTransactionsForDate(date,userName), HttpStatus.OK) ;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    		return new ResponseEntity<List<Transaction>>(service.getTransactionsForDate(date, authentication.getName()), HttpStatus.OK) ;
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
     	
     }
 
-    @GetMapping("/summary/{userName}")
+    //get total summary for current date
+    @GetMapping("/summary")
     public ResponseEntity<Summary> getTodaySummary(@PathVariable String userName) {
     	
     	try {
-    		return new ResponseEntity<>(service.getTodaySummary(userName), HttpStatus.OK) ;
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    		return new ResponseEntity<>(service.getTodaySummary(authentication.getName()), HttpStatus.OK) ;
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
     }
 
+    //delete a transaction
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteTransaction(@PathVariable Long id){
         try {
             service.deleteTransaction(id);
             return new ResponseEntity<>(HttpStatus.OK) ;
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST  );
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 }

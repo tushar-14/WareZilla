@@ -4,6 +4,8 @@ import com.app.warezilla.model.Summary;
 import com.app.warezilla.model.Transaction;
 import com.app.warezilla.service.TransactionService;
 import com.app.warezilla.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,8 @@ public class TransactionController {
         return token;
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
+
     //add a transaction
     @PostMapping()
     public ResponseEntity<Transaction> addTransaction(@RequestBody Transaction transaction) {
@@ -41,7 +45,7 @@ public class TransactionController {
     		return new ResponseEntity<Transaction>(transaction, HttpStatus.OK);
     		
 		} catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error adding transaction: {}", e.getMessage());
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
     }
@@ -54,6 +58,7 @@ public class TransactionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     		return new ResponseEntity<List<Transaction>>(service.getTransactionsForToday(authentication.getName()), HttpStatus.OK) ;
 		} catch (Exception e) {
+            logger.error("Error fetching today's transactions: {}", e.getMessage());
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
         
@@ -67,6 +72,7 @@ public class TransactionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     		return new ResponseEntity<List<Transaction>>(service.getTransactionsForDate(date, authentication.getName()), HttpStatus.OK) ;
 		} catch (Exception e) {
+            logger.error("Error fetching transactions for date {}: {}", date, e.getMessage());
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
     	
@@ -80,6 +86,7 @@ public class TransactionController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     		return new ResponseEntity<>(service.getTodaySummary(authentication.getName()), HttpStatus.OK) ;
 		} catch (Exception e) {
+            logger.error("Error fetching today's summary: {}", e.getMessage());
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
     }
@@ -91,6 +98,7 @@ public class TransactionController {
             service.deleteTransaction(id);
             return new ResponseEntity<>(HttpStatus.OK) ;
         } catch (Exception e) {
+            logger.error("Error deleting transaction with id {}: {}", id, e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

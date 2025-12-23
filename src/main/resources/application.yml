@@ -3,8 +3,8 @@ spring:
     name: warezilla
   datasource:
     url: jdbc:postgresql://localhost:5432/warezilla
-    username: postgres
-    password: tushar41
+    username:  ${DB_USERNAME:?DB username missing}
+    password: ${DB_PASSWORD:?DB password missing}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -17,3 +17,9 @@ spring:
 
 server:
   port: 9080
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    com.warezilla: DEBUG

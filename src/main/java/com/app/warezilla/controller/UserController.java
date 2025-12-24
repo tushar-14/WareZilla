@@ -22,7 +22,7 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @PutMapping()
-    public ResponseEntity<?> updateUser(@RequestBody User user){
+    public ResponseEntity<HttpStatus> updateUser(@RequestBody User user){
 
         try{
 
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<?> deleteUser(){
+    public ResponseEntity<HttpStatus> deleteUser(){
 
         try{
 

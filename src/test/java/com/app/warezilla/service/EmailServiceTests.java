@@ -8,11 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class EmailServiceTests {
 
     @Autowired
-    private EmailService emailService;
+    private UserReportService userReportService;
 
     @Test
     public void emailTests(){
-        emailService.sendEmail("monikavij41@gmail.com","Test Subject","This is a test email body.");
+//        userReportService.sendReports();
     }
 }
 

@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         FROM User u
         JOIN FETCH u.transactionList t
         WHERE u.reportEnabled = true
-        AND t.createdAt BETWEEN :start AND :end
+        AND t.timestamp BETWEEN :start AND :end
     """)
     List<User> findAllByEmailIsNotNullAndReportEnabledTrue(LocalDateTime start, LocalDateTime end);
 }

@@ -27,6 +27,10 @@ spring:
           starttls:
             enable: true
 
+  redis:
+    host: localhost
+    port: 6379
+
 server:
   port: 9080
 
